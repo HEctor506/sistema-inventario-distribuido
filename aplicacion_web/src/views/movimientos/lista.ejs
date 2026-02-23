@@ -1,0 +1,93 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="mb-0">Movimientos</h2>
+  <div>
+    <a href="/movimientos/entrada" class="btn btn-success me-2"><i data-lucide="log-in" class="me-1"></i> Entrada</a>
+    <a href="/movimientos/salida" class="btn btn-danger"><i data-lucide="log-out" class="me-1"></i> Salida</a>
+  </div>
+</div>
+
+<% if (typeof success !== 'undefined' && success) { %>
+  <div class="alert alert-success alert-dismissible fade show" role="alert"><%= success %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+<% } %>
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert"><%= error %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+<% } %>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h6 class="mb-3">Filtros</h6>
+    <form method="GET" action="/movimientos" class="row g-2 align-items-end">
+      <div class="col-auto">
+        <label class="form-label mb-0 small">Desde</label>
+        <input type="date" class="form-control form-control-sm" name="fecha_desde" value="<%= filtros && filtros.fecha_desde ? filtros.fecha_desde : '' %>">
+      </div>
+      <div class="col-auto">
+        <label class="form-label mb-0 small">Hasta</label>
+        <input type="date" class="form-control form-control-sm" name="fecha_hasta" value="<%= filtros && filtros.fecha_hasta ? filtros.fecha_hasta : '' %>">
+      </div>
+      <div class="col-auto">
+        <label class="form-label mb-0 small">Tipo</label>
+        <select class="form-select form-select-sm" name="tipo">
+          <option value="">Todos</option>
+          <option value="entrada" <%= filtros && filtros.tipo === 'entrada' ? 'selected' : '' %>>Entrada</option>
+          <option value="salida" <%= filtros && filtros.tipo === 'salida' ? 'selected' : '' %>>Salida</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <label class="form-label mb-0 small">Producto</label>
+        <select class="form-select form-select-sm" name="producto_id">
+          <option value="">Todos</option>
+          <% if (productos) productos.forEach(p => { %>
+            <option value="<%= p.producto_id %>" <%= filtros && filtros.producto_id == p.producto_id ? 'selected' : '' %>><%= p.nombre %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm"><i data-lucide="search"></i> Filtrar</button>
+        <a href="/movimientos" class="btn btn-outline-secondary btn-sm">Limpiar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Producto</th>
+            <th>Tipo</th>
+            <th>Cantidad</th>
+            <th>Proveedor</th>
+            <th>Observación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!movimientos || movimientos.length === 0) { %>
+            <tr><td colspan="7" class="text-center text-muted py-4">No hay movimientos</td></tr>
+          <% } else { %>
+            <% movimientos.forEach(m => { %>
+              <tr>
+                <td><%= m.movimiento_id %></td>
+                <td><%= new Date(m.fecha).toLocaleString('es-EC') %></td>
+                <td><%= m.producto_nombre || '-' %></td>
+                <td><span class="badge <%= m.tipo === 'entrada' ? 'bg-success' : 'bg-danger' %>"><%= m.tipo %></span></td>
+                <td><%= m.cantidad %></td>
+                <td><%= m.proveedor_nombre || '-' %></td>
+                <td><%= m.observacion || '-' %></td>
+              </tr>
+            <% }) %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>lucide.createIcons();</script>

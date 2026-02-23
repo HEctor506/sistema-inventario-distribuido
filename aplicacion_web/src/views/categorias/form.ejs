@@ -1,0 +1,24 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="mb-0"><%= categoria ? 'Editar' : 'Nueva' %> Categoría</h2>
+  <a href="/categorias" class="btn btn-outline-secondary"><i data-lucide="arrow-left" class="me-1"></i> Volver</a>
+</div>
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert"><%= error %><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+<% } %>
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form method="POST" action="<%= categoria ? '/categorias/editar/' + categoria.categoria_id : '/categorias' %>">
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="nombre" name="nombre" required value="<%= categoria ? categoria.nombre : '' %>" maxlength="80">
+      </div>
+      <div class="mb-3">
+        <label for="descripcion" class="form-label">Descripción</label>
+        <textarea class="form-control" id="descripcion" name="descripcion" rows="2"><%= categoria ? (categoria.descripcion || '') : '' %></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary"><i data-lucide="save" class="me-1"></i><%= categoria ? 'Guardar' : 'Crear' %></button>
+      <a href="/categorias" class="btn btn-outline-secondary ms-2">Cancelar</a>
+    </form>
+  </div>
+</div>
+<script>lucide.createIcons();</script>

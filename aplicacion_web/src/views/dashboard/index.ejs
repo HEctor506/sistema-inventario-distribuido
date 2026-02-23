@@ -1,0 +1,109 @@
+<h2 class="mb-4">Panel Principal</h2>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card p-4 shadow-sm">
+      <h6 class="text-muted text-uppercase small mb-2">Total Productos</h6>
+      <h3 class="mb-0 text-primary"><%= totalProductos %></h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-4 shadow-sm">
+      <h6 class="text-muted text-uppercase small mb-2">Productos Stock Bajo</h6>
+      <h3 class="mb-0 text-danger"><%= stockBajo %></h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-4 shadow-sm">
+      <h6 class="text-muted text-uppercase small mb-2">Valor Total Inventario</h6>
+      <h3 class="mb-0">$<%= parseFloat(valorInventario || 0).toLocaleString('es-EC', { minimumFractionDigits: 2 }) %></h3>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card shadow-sm p-3">
+      <h5 class="mb-3">Movimientos últimos 30 días</h5>
+      <canvas id="chartMovimientos" height="120"></canvas>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card shadow-sm p-3">
+      <h5 class="mb-3">Top Categorías por Valor</h5>
+      <ul class="list-group list-group-flush">
+        <% if (!topCategorias || topCategorias.length === 0) { %>
+          <li class="list-group-item px-0 text-muted">Sin datos</li>
+        <% } else { %>
+          <% topCategorias.forEach((c, i) => { %>
+            <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+              <span><%= i + 1 %>. <%= c.nombre %></span>
+              <span class="badge bg-primary">$<%= parseFloat(c.valor || 0).toLocaleString('es-EC', { minimumFractionDigits: 2 }) %></span>
+            </li>
+          <% }) %>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card shadow-sm p-3">
+      <h5 class="mb-3">Movimientos Recientes (últimos 10)</h5>
+      <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Producto</th>
+              <th>Tipo</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!movimientos || movimientos.length === 0) { %>
+              <tr><td colspan="5" class="text-center text-muted">No hay movimientos recientes</td></tr>
+            <% } else { %>
+              <% movimientos.forEach(m => { %>
+                <tr>
+                  <td><%= m.movimiento_id %></td>
+                  <td><%= new Date(m.fecha).toLocaleString('es-EC') %></td>
+                  <td><%= m.producto_nombre || '-' %></td>
+                  <td><span class="badge <%= m.tipo === 'entrada' ? 'bg-success' : 'bg-danger' %>"><%= m.tipo %></span></td>
+                  <td><%= m.cantidad %></td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('chartMovimientos');
+  if (ctx) {
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: <%- JSON.stringify(chartLabels) %>,
+        datasets: [
+          { label: 'Entradas', data: <%- JSON.stringify(chartEntradas) %>, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', fill: true, tension: 0.3 },
+          { label: 'Salidas', data: <%- JSON.stringify(chartSalidas) %>, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', fill: true, tension: 0.3 }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'top' } },
+        scales: {
+          x: { display: true, ticks: { maxTicksLimit: 10 } },
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  }
+</script>
